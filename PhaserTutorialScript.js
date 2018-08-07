@@ -81,6 +81,9 @@ function createPlatforms(scene){
 	//scene.add.image(400, 300, 'sky');
     platforms = scene.physics.add.staticGroup();
     platforms.create(200, 568, 'ground').setScale(2).refreshBody();
+	platforms.create(200*3, 568, 'ground').setScale(2).refreshBody();
+	platforms.create(200 * 6, 568, 'ground').setScale(2).refreshBody();
+	platforms.create(200 * 9, 568, 'ground').setScale(4).refreshBody();
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
@@ -89,7 +92,7 @@ function createPlatforms(scene){
 function createPlayer(scene){
 	player = scene.physics.add.sprite(100, 450, 'dude');
 	player.setBounce(0.2);
-	//player.setCollideWorldBounds(true);
+	player.setCollideWorldBounds(true);
 	player.body.setGravityY(300);
 
 	scene.anims.create({
