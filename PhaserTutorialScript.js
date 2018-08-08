@@ -23,13 +23,13 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'assets/sky.png');
+    this.load.image('sky', 'assets/GoldenKn.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 
-        'assets/testSorloSprite.png',
-        { frameWidth: 75, frameHeight: 75 }
+        'assets/GoldenKnight.png',
+        { frameWidth: 30, frameHeight: 54 }
     );
 }
 
@@ -103,20 +103,20 @@ function createPlayer(scene){
 
 	scene.anims.create({
 		key: 'left',
-		frames: scene.anims.generateFrameNumbers('dude', { start: 0, end	: 3 }),
+		frames: scene.anims.generateFrameNumbers('dude', { start: 0, end	: 6 }),
 		frameRate: 10,
 		repeat: -1
 	});
 
 	scene.anims.create({
 		key: 'turn',
-		frames: [ { key: 'dude', frame: 4 } ],
+		frames: [ { key: 'dude', frame: 14 } ],
 		frameRate: 20
 	});
 
 	scene.anims.create({
 		key: 'right',
-		frames: scene.anims.generateFrameNumbers('dude', { start: 5, end	: 8 }),
+		frames: scene.anims.generateFrameNumbers('dude', { start: 7, end	: 13 }),
 		frameRate: 10,
 		repeat: -1
 	});
@@ -167,11 +167,11 @@ function checkControls()
 	}
 	else if (cursors.right.isDown){
 		player.setVelocityX(160);
-		//player.anims.play('right', true);
+		player.anims.play('right', true);
 	}
 	else{
 		player.setVelocityX(0);
-		//player.anims.play('turn');
+		player.anims.play('turn');
 	}
 
 	if (cursors.up.isDown && player.body.touching.down){
