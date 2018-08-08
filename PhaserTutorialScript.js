@@ -2,6 +2,7 @@ var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+	backgroundColor: Phaser.Display.Color.GetColor(75,200,100),
     physics: {
         default: 'arcade',
         arcade: {
@@ -14,6 +15,7 @@ var config = {
         create: create,
         update: update
     }
+	
 };
 
 var game = new Phaser.Game(config);
@@ -56,6 +58,7 @@ function create ()
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs, platforms);
 	this.physics.add.collider(player, bombs, hitBomb, null, this);
+	this.physics.world.setBounds(0,0,800*4,600,true,true,true,true);
 	
 }
 
@@ -67,8 +70,8 @@ function update ()
 
 function setCamera(scene)
 {
-	 scene.cameras.main.setBounds(0, 0, 720 * 4, 176);
-	 scene.cameras.main.startFollow(player, true);
+	scene.cameras.main.setBounds(0, 0, 800 * 4, 176);
+	scene.cameras.main.startFollow(player, true);
     scene.cameras.main.setZoom(1);
 	if (scene.cameras.main.deadzone)
     {
@@ -80,20 +83,23 @@ function setCamera(scene)
 function createPlatforms(scene){
 	//scene.add.image(400, 300, 'sky');
     platforms = scene.physics.add.staticGroup();
-    platforms.create(200, 568, 'ground').setScale(2).refreshBody();
-	platforms.create(200*3, 568, 'ground').setScale(2).refreshBody();
-	platforms.create(200 * 6, 568, 'ground').setScale(2).refreshBody();
-	platforms.create(200 * 9, 568, 'ground').setScale(3).refreshBody();
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
+	createPlatformRow(15, 600, 0);
+	createPlatformRow(4, 400, 450);
+	createPlatformRow(4, 400, 200*9);
 };
+
+function createPlatformRow(amount, height, x){
+	var i;
+	for(i= 1; i <=amount; i++){
+		platforms.create(x+(200 * i), height, 'ground').setScale(1).refreshBody();
+	}
+}
 
 function createPlayer(scene){
 	player = scene.physics.add.sprite(100, 450, 'dude');
 	player.setBounce(0.2);
-	//player.setCollideWorldBounds(true);
-	player.body.setGravityY(300);
+	player.setCollideWorldBounds(true);
+	player.body.setGravityY(600);
 
 	scene.anims.create({
 		key: 'left',
