@@ -1,26 +1,3 @@
-var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-	backgroundColor: Phaser.Display.Color.GetColor(75,200,100),
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: {y: 20},
-            debug: false
-        }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-	
-};
-
-var game = new Phaser.Game(config);
-
-
 function preload ()
 {
     this.load.image('sky', 'assets/GoldenKn.png');
@@ -53,7 +30,6 @@ function create ()
 	this.physics.add.collider(player, platforms);
 	this.physics.add.collider(stars, platforms);
 	this.physics.add.overlap(player, stars, collectStar, null, this);
-	scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 	cursors = this.input.keyboard.createCursorKeys();
 	bombs = this.physics.add.group();
 	this.physics.add.collider(bombs, platforms);
@@ -175,7 +151,7 @@ function checkControls()
 	}
 
 	if (cursors.up.isDown && player.body.touching.down){
-		player.setVelocityY(-600);
+		player.setVelocityY(-400);
 	}
 };
 
@@ -187,3 +163,37 @@ function hitBomb (player, bomb)
     player.anims.play('turn');
     gameOver = true;
 }
+
+
+var mainScene = new Phaser.Scene("MainScene")
+	mainScene.preload = preload;
+	mainScene.create = create;
+	mainScene.update = update;
+
+
+
+
+var hud = new Phaser.Scene("hud");
+hud.active=true;
+hud.preload = function (){};
+hud.create = function(){scoreText = this.add.text(16, 16, 'PlayerHP: 10', { fontSize: '32px',});};
+hud.update = function(){};
+
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+	backgroundColor: Phaser.Display.Color.GetColor(75,200,100),
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: {y: 100},
+            debug: false
+        }
+    },
+    scene: [{hud},{mainScene}]
+	
+};
+var game = new Phaser.Game(config);
+game.scene.add('hud', hud, true, { x: 400, y: 300 })
+game.scene.add('mainScene', mainScene, true)
