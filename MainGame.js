@@ -1,7 +1,9 @@
+
 function preload ()
 {
     this.load.image('sky', 'assets/GoldenKn.png');
     this.load.image('ground', 'assets/platform.png');
+	this.load.image('column', 'assets/Column.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 
@@ -11,10 +13,9 @@ function preload ()
 }
 
 var platforms;
+var columns;
 var player;
 var cursors;
-var stars;
-var bombs;
 var score = 0;
 var scoreText;
 
@@ -25,15 +26,12 @@ function create ()
 	
 	createPlatforms(this);
     createPlayer(this);
-	createStars(this);
+	createColumns(this)
 	setCamera(this);
 	this.physics.add.collider(player, platforms);
-	this.physics.add.collider(stars, platforms);
-	this.physics.add.overlap(player, stars, collectStar, null, this);
+	this.physics.add.collider(player, columns);
 	cursors = this.input.keyboard.createCursorKeys();
 	bombs = this.physics.add.group();
-	this.physics.add.collider(bombs, platforms);
-	this.physics.add.collider(player, bombs, hitBomb, null, this);
 	this.physics.world.setBounds(0,0,800*4,600,true,true,true,true);
 	
 }
@@ -41,13 +39,13 @@ function create ()
 
 function update ()
 {
-	checkControls();
+	checkControls(player, cursors);
 }
 
 function setCamera(scene)
 {
 	scene.cameras.main.setBounds(0, 0, 800 * 4, 176);
-	scene.cameras.main.startFollow(player, true);
+	//scene.cameras.main.startFollow(player, true);
     scene.cameras.main.setZoom(1);
 	if (scene.cameras.main.deadzone)
     {
@@ -57,11 +55,10 @@ function setCamera(scene)
     }
 }
 function createPlatforms(scene){
-	//scene.add.image(400, 300, 'sky');
     platforms = scene.physics.add.staticGroup();
-	createPlatformRow(15, 600, 0);
-	createPlatformRow(4, 400, 450);
-	createPlatformRow(4, 400, 200*9);
+	createPlatformRow(3, 600, 0);
+	createPlatformRow(3, 0, 0);
+	
 };
 
 function createPlatformRow(amount, height, x){
@@ -71,12 +68,20 @@ function createPlatformRow(amount, height, x){
 	}
 }
 
+function createColumns(scene){
+	columns = scene.physics.add.staticGroup();
+	columns.create(10, 400, 'column').setScale(1).refreshBody();
+	columns.create(10, 0, 'column').setScale(1).refreshBody();
+	columns.create(800, 400, 'column').setScale(1).refreshBody();
+	columns.create(800, 0, 'column').setScale(1).refreshBody();
+}
+
+
+
 function createPlayer(scene){
 	player = scene.physics.add.sprite(100, 450, 'dude');
-	player.setBounce(0.2);
 	player.setCollideWorldBounds(true);
-	player.body.setGravityY(600);
-
+	
 	scene.anims.create({
 		key: 'left',
 		frames: scene.anims.generateFrameNumbers('dude', { start: 0, end	: 6 }),
@@ -98,71 +103,37 @@ function createPlayer(scene){
 	});
 };
 
-function collectStar (player, star)
-{
-   star.disableBody(true, true);
 
-    score += 10;
-    scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0)
-    {
-        stars.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
-
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
-    }
-}
-
-function createStars(scene){
-	stars = scene.physics.add.group({
-    key: 'star',
-    repeat: 11,
-    setXY: { x: 12, y: 0, stepX: 70 }
-	});
-
-	stars.children.iterate(function (child) {
-    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-	});
-};
 function checkControls()
 {
+	var keyPressed = false;
 	if (cursors.left.isDown){
 		player.setVelocityX(-160);
 		player.anims.play('left', true);
+		keyPressed = true;
 	}
-	else if (cursors.right.isDown){
+	if (cursors.right.isDown){
 		player.setVelocityX(160);
 		player.anims.play('right', true);
+		keyPressed = true;
 	}
-	else{
+	
+	if (cursors.up.isDown){
+		player.setVelocityY(-200);
+		keyPressed = true;
+	}
+	if (cursors.down.isDown ){
+		player.setVelocityY(200);
+		keyPressed = true;
+	}
+	if(!keyPressed){
 		player.setVelocityX(0);
+		player.setVelocityY(0);
 		player.anims.play('turn');
 	}
-
-	if (cursors.up.isDown && player.body.touching.down){
-		player.setVelocityY(-400);
-	}
-};
-
-function hitBomb (player, bomb)
-{
-    this.physics.pause();
-
-    player.setTint(0xff0000);
-    player.anims.play('turn');
-    gameOver = true;
 }
+
+
 
 
 var mainScene = new Phaser.Scene("MainScene")
@@ -187,7 +158,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: {y: 100},
+            gravity: {y: 0},
             debug: false
         }
     },
